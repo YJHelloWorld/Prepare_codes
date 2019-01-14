@@ -11,6 +11,7 @@ from NPTFit import create_mask as cm
 #os.system('rm -rf /smc/jianyao/datasets/image_matrix/2_channels/train; mkdir /smc/jianyao/datasets/image_matrix/2_channels/train')
 import itchat
 import threading
+import random
 
 import camb                                                                                                            
 from camb import model, initialpower 
@@ -70,7 +71,9 @@ def produce_cl(r_value):
     return Cl
 ######
 
-Fg = []; loc = '353_with_differ_r'; image_dir = '/smc/jianyao/datasets/image_matrix/%s'%loc; check_dir = '/smc/jianyao/checkpoints/%s'%loc;
+fake_cls = np.ones(lmax)
+
+Fg = []; loc = '1014_differ_tensor'; image_dir = '/smc/jianyao/datasets/image_matrix/%s'%loc; check_dir = '/smc/jianyao/checkpoints/%s'%loc;
 train_dir = os.path.join(image_dir, 'train'); test_dir = os.path.join(image_dir, 'test')  # collection for fg...
 if not os.path.exists(image_dir):os.makedirs(train_dir);os.makedirs(test_dir)
 
@@ -112,7 +115,8 @@ for i in range(50):
 
 	 	r_n = k/210	
 	        cl_real = produce_cl(rs[r_n])       
-
+		if r_n%2=0:
+		    cl_real[2,:] = fake_cls*1e-5*random.uniform(0.1,10) 
 		cmb_map = hp.synfast(cl_real, nside, new = True, verbose = False)
 		alms = hp.map2alm(cmb_map)
 #		cmb_map = np.random.uniform(-600,700,12*nside**2)
