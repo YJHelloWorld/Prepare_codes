@@ -115,7 +115,7 @@ for i in range(50):
 
 	 	r_n = k/210	
 	        cl_real = produce_cl(rs[r_n])       
-		if r_n%2=0:
+		if r_n%2==0:
 		    cl_real[2,:] = fake_cls*1e-5*random.uniform(0.1,10) 
 		cmb_map = hp.synfast(cl_real, nside, new = True, verbose = False)
 		alms = hp.map2alm(cmb_map)
