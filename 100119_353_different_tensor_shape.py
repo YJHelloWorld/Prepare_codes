@@ -71,7 +71,7 @@ def produce_cl(r_value):
     return Cl
 ######
 
-fake_cls = np.ones(lmax)
+fake_cls = np.ones(lmax+1)
 
 Fg = []; loc = '1014_differ_tensor'; image_dir = '/smc/jianyao/datasets/image_matrix/%s'%loc; check_dir = '/smc/jianyao/checkpoints/%s'%loc;
 train_dir = os.path.join(image_dir, 'train'); test_dir = os.path.join(image_dir, 'test')  # collection for fg...
