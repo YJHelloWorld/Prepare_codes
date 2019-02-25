@@ -109,7 +109,8 @@ for i in range(10):
 #               cmb_map = hp.synfast(cl,nside)
 #		factor = np.random.uniform(0.5,10,3*nside)
 #		cl = cl_real*factor
-
+		
+#		r_n = k/210
 	 	r_n = k/2	
 	        cl_real = produce_cl(rs[r_n])       
 
@@ -150,7 +151,7 @@ for i in range(10):
 ####
 	#		    cmb_matrix = cmb_map[j][pixels]
 	#	            total_matrix = total[fre][j][pixels] + cmb_matrix
-####
+#####
 		            combine = np.column_stack((cmb_matrix, total_matrix))
 		            outfile.write('#Array shape:{0}\n'.format(combine.shape))
 	#                np.savetxt('/home/jianyao/pytorch-CycleGAN-and-pix2pix/datasets/image_matrix/train/totals%s.txt'%(i+687),combine, fmt = '%.2f')
@@ -173,7 +174,7 @@ for i in range(10):
 		Fg.append(fg)
 
 np.savetxt('%s/norm_factors.txt'%check_dir, Fg)
-os.system('python ../test.py --dataroot %s --name %s --model pix2pix --which_model_netG resnet_9blocks --which_direction BtoA --dataset_mode aligned --norm batch --input_nc 6 --output_nc 2'%(image_dir, check_dir))
+os.system('python ../test.py --dataroot %s --name %s --model pix2pix --which_model_netG unet_64 --which_direction BtoA --dataset_mode aligned --norm batch --input_nc 6 --output_nc 2'%(image_dir, check_dir))
 os.system('mv %s/norm_factors.txt %s/test_latest/'%(check_dir, check_dir))
 
-#os.system('nohup python ../train.py --dataroot %s --name %s --model pix2pix --which_model_netG unet_65 --which_direction BtoA --dataset_mode aligned --no_lsgan --norm batch --pool_size 0 --loadSize 256 --fineSize 256 --gpu_ids 0 --input_nc 6 --output_nc 2 --display_freq 1 --batchSize 32 --save_epoch_freq 100 --display_id 0 --niter 300 --niter_decay 300 &'%(image_dir, check_dir))
+#os.system('nohup python ../train.py --dataroot %s --name %s --model pix2pix --which_model_netG unet_64 --which_direction BtoA --dataset_mode aligned --no_lsgan --norm batch --pool_size 0 --loadSize 256 --fineSize 256 --gpu_ids 0 --input_nc 6 --output_nc 2 --display_freq 1 --batchSize 32 --save_epoch_freq 100 --display_id 0 --niter 300 --niter_decay 300 &'%(image_dir, check_dir))
