@@ -78,7 +78,7 @@ train_dir = os.path.join(image_dir, 'train'); test_dir = os.path.join(image_dir,
 if not os.path.exists(image_dir):os.makedirs(train_dir);os.makedirs(test_dir)
 
 f1_config = models("f1", nside)	
-for i in range(10):		
+for i in range(50):		
     for s in range(1,4): #3
         s1_config = models("s%s"%s, nside)
 		
@@ -113,7 +113,7 @@ for i in range(10):
 #		factor = np.random.uniform(0.5,10,3*nside)
 #		cl = cl_real*factor
 
-	 	r_n = k/2 #k/210	
+	 	r_n = k/210	
 	        cl_real = produce_cl(rs[r_n])       
 		if r_n%2==0:
 		    cl_real[2,:] = fake_cls*1e-5*random.uniform(0.1,10) 
