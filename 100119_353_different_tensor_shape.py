@@ -78,14 +78,14 @@ train_dir = os.path.join(image_dir, 'train'); test_dir = os.path.join(image_dir,
 if not os.path.exists(image_dir):os.makedirs(train_dir);os.makedirs(test_dir)
 
 f1_config = models("f1", nside)	
-for i in range(50):		
-    for s in range(1,4): #3
+for i in range(10):		
+    for s in range(1,2): #3
         s1_config = models("s%s"%s, nside)
 		
-	for d in range(1,8): #7
+	for d in range(6,8): #7
 	    d1_config = models("d%s"%d, nside)
 		    
-	    for a in range(1,3): #2
+	    for a in range(2,3): #2
 		a1_config = models("a%s"%a, nside)
 		c1_config = models("c1", 128)
 	
@@ -98,9 +98,6 @@ for i in range(50):
 		sky = pysm.Sky(sky_config);
 		total = sky.signal()(nu) 
 ###
-#		sync = sky.synchrotron(nu)
-#		total = total + sync*1e3
-### to let the sync with dust
 		total = convert_unit(total)
 		cmb_all = []; total_all = []
 		# multiply every cl with a factor randomly generated between [0.5,2], 07_02 21:54
@@ -113,10 +110,11 @@ for i in range(50):
 #		factor = np.random.uniform(0.5,10,3*nside)
 #		cl = cl_real*factor
 
-	 	r_n = k/210	
+	 	r_n = k/2  #k/210	
 	        cl_real = produce_cl(rs[r_n])       
 		if r_n%2==0:
-		    cl_real[2,:] = fake_cls*1e-5*random.uniform(0.1,10) 
+		    for l in range(3*nside):
+			cl_real[2,:][l] = 1e-5*random.uniform(0.1,10) 
 		cmb_map = hp.synfast(cl_real, nside, new = True, verbose = False)
 		alms = hp.map2alm(cmb_map)
 #		cmb_map = np.random.uniform(-600,700,12*nside**2)
