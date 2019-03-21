@@ -26,7 +26,7 @@ def convert_unit(map):
         map[i] = map[i]*coefficients[i]
     return map
 
-xsize = 64; ysize = 64
+xsize = 128; ysize = 128
 nside = 64
 phi = np.radians(np.linspace(5,85, xsize))   #0-180 start from the North Pole ,latitude
 theta = np.radians(np.linspace(-60, 60, ysize)) # -180-180 start from the right , longtitude
@@ -59,7 +59,8 @@ def text_reply(msg):
 pars = camb.CAMBparams()
 pars.set_cosmology(H0=67.5, ombh2=0.022, omch2=0.122, mnu=0.06, omk=0, tau=0.06);pars.WantTensors = True               
 results = camb.get_transfer_functions(pars)                                                                            
-rs = np.linspace(0,0.1,10)
+#rs = np.linspace(0,0.1,10)
+rs = np.logspace(-4,-1,10)
 #####
 lmax = 3*nside-1
 def produce_cl(r_value):
@@ -73,19 +74,19 @@ def produce_cl(r_value):
 
 fake_cls = np.ones(lmax+1)
 
-Fg = []; loc = '0207_differ_tensor'; image_dir = '/smc/jianyao/datasets/image_matrix/%s'%loc; check_dir = '/smc/jianyao/checkpoints/%s'%loc;
+Fg = []; loc = '0320_differ_tensor'; image_dir = '/smc/jianyao/datasets/image_matrix/%s'%loc; check_dir = '/smc/jianyao/checkpoints/%s'%loc;
 train_dir = os.path.join(image_dir, 'train'); test_dir = os.path.join(image_dir, 'test')  # collection for fg...
 if not os.path.exists(image_dir):os.makedirs(train_dir);os.makedirs(test_dir)
 
 f1_config = models("f1", nside)	
-for i in range(10):		
-    for s in range(1,2): #3
+for i in range(50):		
+    for s in range(1,4): #3
         s1_config = models("s%s"%s, nside)
 		
-	for d in range(6,8): #7
+	for d in range(1,8): #7
 	    d1_config = models("d%s"%d, nside)
 		    
-	    for a in range(2,3): #2
+	    for a in range(1,3): #2
 		a1_config = models("a%s"%a, nside)
 		c1_config = models("c1", 128)
 	
@@ -100,21 +101,12 @@ for i in range(10):
 ###
 		total = convert_unit(total)
 		cmb_all = []; total_all = []
-		# multiply every cl with a factor randomly generated between [0.5,2], 07_02 21:54
-#		for l in range(3*nside):
-#		    cl[l] = cl_real[l]*factor[l]
-##		coeff_cl = np.random.uniform(100,5000,3*nside)
-##                ell = np.arange(384); ell[0] = 1
-##               cl = coeff_cl*2*np.pi/ell/(ell+1)
-#               cmb_map = hp.synfast(cl,nside)
-#		factor = np.random.uniform(0.5,10,3*nside)
-#		cl = cl_real*factor
 
-	 	r_n = k/2  #k/210	
+	 	r_n = k/210  #k/210	
 	        cl_real = produce_cl(rs[r_n])       
-		if r_n%2==0:
-		    for l in range(3*nside):
-			cl_real[2,:][l] = 1e-5*random.uniform(0.1,10) 
+#		if r_n%2==0:
+#		    for l in range(3*nside):
+#			cl_real[2,:][l] = 1e-5*random.uniform(0.1,10) 
 		cmb_map = hp.synfast(cl_real, nside, new = True, verbose = False)
 		alms = hp.map2alm(cmb_map)
 #		cmb_map = np.random.uniform(-600,700,12*nside**2)
@@ -134,7 +126,7 @@ for i in range(10):
 		fg = []; fg.append(fnf)
 #		Q_U = [0, std_Q, std_U]; Q_U_mean = [0, mean_Q, mean_U]
 ####
-		with file('%s/QU_7_fre_%s.txt'%(test_dir, k), 'w') as outfile:
+		with file('%s/QU_7_fre_%s.txt'%(train_dir, k), 'w') as outfile:
 			
 		    for fre in range(Nf):
 			total_with_cmb_Q = cmb_map[1] + total[fre][1] + white_noise[fre]
@@ -174,8 +166,8 @@ for i in range(10):
                         outfile.write('#New dimension\n')
 		Fg.append(fg)
 
-np.savetxt('%s/norm_factors.txt'%check_dir, Fg)
-os.system('python ../test.py --dataroot %s --name %s --model pix2pix --which_model_netG unet_64 --which_direction BtoA --dataset_mode aligned --norm batch --input_nc 6 --output_nc 2'%(image_dir, check_dir))
-os.system('mv %s/norm_factors.txt %s/test_latest/'%(check_dir, check_dir))
+#np.savetxt('%s/norm_factors.txt'%check_dir, Fg)
+#os.system('python ../test.py --dataroot %s --name %s --model pix2pix --which_model_netG unet_128 --which_direction BtoA --dataset_mode aligned --norm batch --input_nc 6 --output_nc 2'%(image_dir, check_dir))
+#os.system('mv %s/norm_factors.txt %s/test_latest/'%(check_dir, check_dir))
 
-#os.system('nohup python ../train.py --dataroot %s --name %s --model pix2pix --which_model_netG unet_64 --which_direction BtoA --dataset_mode aligned --no_lsgan --norm batch --pool_size 0 --loadSize 256 --fineSize 256 --gpu_ids 0 --input_nc 6 --output_nc 2 --display_freq 1 --batchSize 32 --save_epoch_freq 100 --display_id 0 --niter 300 --niter_decay 300 &'%(image_dir, check_dir))
+os.system('nohup python ../train.py --dataroot %s --name %s --model pix2pix --which_model_netG unet_128 --which_direction BtoA --dataset_mode aligned --no_lsgan --norm batch --pool_size 0 --loadSize 256 --fineSize 256 --gpu_ids 0 --input_nc 6 --output_nc 2 --display_freq 1 --batchSize 32 --save_epoch_freq 100 --display_id 0 --niter 300 --niter_decay 300 &'%(image_dir, check_dir))
