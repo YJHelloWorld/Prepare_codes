@@ -80,16 +80,16 @@ train_dir = os.path.join(image_dir, 'train'); test_dir = os.path.join(image_dir,
 if not os.path.exists(image_dir):os.makedirs(train_dir);os.makedirs(test_dir)
 
 f1_config = models("f1", nside)	
-for i in range(50):		
-    for s in range(1,4): #3
+for i in range(1):		
+    for s in range(1,3): #3
         s1_config = models("s%s"%s, nside)
 		
-	for d in range(1,8): #7
+	for d in range(1,6): #7
 	    d1_config = models("d%s"%d, nside)
 		    
-	    for a in range(1,3): #2
+	    for a in range(2,3): #2
 		a1_config = models("a%s"%a, nside)
-		c1_config = models("c1", nside)
+#		c1_config = models("c1", 128)
 	
 		sky_config = {
 		                'synchrotron' : s1_config,
@@ -100,11 +100,11 @@ for i in range(50):
 		sky = pysm.Sky(sky_config);
 		total = sky.signal()(nu) 
 		synchrotron = sky.synchrotron(nu)
-		total = convert_unit(total)#+synchrotron)
+		total = convert_unit(total)
 		cmb_all = []; total_all = []
 
-	 	r_n = k/210 #k/210	
-	        cl_real = produce_cl(rs[r_n])       
+	 	r_n =   5 #k/210	
+	        cl_real = produce_cl(rs[r_n])      
 #		if r_n%2==0:
 #		    for l in range(3*nside):
 #			cl_real[2,:][l] = 1e-5*random.uniform(0.1,10) 
@@ -127,7 +127,7 @@ for i in range(50):
 		fg = []; fg.append(fnf)
 #		Q_U = [0, std_Q, std_U]; Q_U_mean = [0, mean_Q, mean_U]
 ####
-		with file('%s/QU_7_fre_%s.txt'%(train_dir, k), 'w') as outfile:
+		with file('%s/QU_7_fre_%s.txt'%(test_dir, k), 'w') as outfile:
 			
 		    for fre in range(Nf):
 			total_with_cmb_Q = cmb_map[1] + total[fre][1] + white_noise[fre]
@@ -166,9 +166,9 @@ for i in range(50):
                         np.savetxt(outfile, combine, fmt = '%.4f')
                         outfile.write('#New dimension\n')
 		Fg.append(fg)
-'''
+
 np.savetxt('%s/norm_factors.txt'%check_dir, Fg)
 os.system('python ../test.py --dataroot %s --name %s --model pix2pix --which_model_netG unet_128 --which_direction BtoA --dataset_mode aligned --norm batch --input_nc 6 --output_nc 2'%(image_dir, check_dir))
 os.system('mv %s/norm_factors.txt %s/test_latest/'%(check_dir, check_dir))
-'''
-os.system('nohup python ../train.py --dataroot %s --name %s --model pix2pix --which_model_netG unet_128 --which_direction BtoA --dataset_mode aligned --no_lsgan --norm batch --pool_size 0 --loadSize 256 --fineSize 256 --gpu_ids 1 --input_nc 6 --output_nc 2 --display_freq 1 --batchSize 32 --save_epoch_freq 100 --display_id 0 --niter 150 --niter_decay 150 &'%(image_dir, check_dir))
+
+#os.system('nohup python ../train.py --dataroot %s --name %s --model pix2pix --which_model_netG unet_128 --which_direction BtoA --dataset_mode aligned --no_lsgan --norm batch --pool_size 0 --loadSize 256 --fineSize 256 --gpu_ids 0,1 --input_nc 6 --output_nc 2 --display_freq 1 --batchSize 32 --save_epoch_freq 100 --display_id 0 --niter 200 --niter_decay 200 &'%(image_dir, check_dir))
